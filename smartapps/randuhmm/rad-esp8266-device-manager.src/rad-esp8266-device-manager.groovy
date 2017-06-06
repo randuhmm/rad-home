@@ -100,7 +100,9 @@ void verifyDevices() {
         String ip = convertHexToIP(it.value.networkAddress)
         String host = "${ip}:${port}"
         log.debug "verifyDevices(): $host"
-        sendHubCommand(new physicalgraph.device.HubAction("""GET ${it.value.ssdpPath} HTTP/1.1\r\nHOST: $host\r\n\r\n""", physicalgraph.device.Protocol.LAN, host, [callback: deviceDescriptionHandler]))
+        sendHubCommand(new physicalgraph.device.HubAction(
+        	"""GET ${it.value.ssdpPath} HTTP/1.1\r\nHOST: $host\r\n\r\n""",
+            physicalgraph.device.Protocol.LAN, host, [callback: deviceDescriptionHandler]))
     }
 }
 
@@ -139,12 +141,12 @@ def addDevices() {
                 ]
             ])
             
-            selectedDevice?.value?.things.each { thing ->
-            	def thing_dni = "${selectedDevice.value.mac}-${thing.name}"
-                addChildDevice("randuhmm", thing.type, thing_dni, selectedDevice?.value.hub, [
-                    "label": thing?.name ?: thing.type ,
+            selectedDevice?.value?.devices.each { rd ->
+            	def rd_dni = "${selectedDevice.value.mac}-${rd.feature_name}"
+                addChildDevice("randuhmm", rd.feature_type, rd_dni, selectedDevice?.value.hub, [
+                    "label": rd?.feature_name ?: rd.feature_type ,
                     "data": [
-                    	"id": thing.name,
+                    	"id": rd.feature_name,
                         "mac": selectedDevice.value.mac,
                         "ip": selectedDevice.value.networkAddress,
                         "port": selectedDevice.value.deviceAddress
@@ -183,16 +185,41 @@ def ssdpHandler(evt) {
 
 void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
     log.debug "deviceDescriptionHandler()"
+    log.debug "${hubResponse}"
+    log.debug "${hubResponse.body}"
     def body = hubResponse.json
     def devices = getDevices()
-    def device = devices.find { it?.key?.contains(body.UDN) }
+    def UDN = body.UDN
+    def device = devices.find { it?.key?.contains(UDN) }
     if (device) {
         device.value << [
-            name: body.deviceName,
-            model: body.modelName,
-            serialNumber: body.serialNum,
+            name: body.name,
+            type: body.type,
+            model: body.model,
+            description: body.description,
+            serial: body.serial,
+        ]
+        int port = convertHexToInt(device.value.deviceAddress)
+        String ip = convertHexToIP(device.value.networkAddress)
+        String host = "${ip}:${port}"
+        sendHubCommand(new physicalgraph.device.HubAction(
+        	"""GET /features HTTP/1.1\r\nHOST: $host\r\n\r\n""",
+            physicalgraph.device.Protocol.LAN, host,
+            [callback: deviceDevicesHandler]))
+    }
+}
+
+def deviceDevicesHandler(physicalgraph.device.HubResponse hubResponse) {
+    log.debug "deviceDescriptionHandler()"
+    log.debug "${hubResponse}"
+    log.debug "${hubResponse.body}"
+    def _devices = hubResponse.json
+    def devices = getDevices()
+    def device = devices.find { it?.value?.mac == hubResponse.mac }
+    if (device) {
+        device.value << [
+            devices: _devices,
             verified: true,
-            things: body.things
         ]
     }
 }
