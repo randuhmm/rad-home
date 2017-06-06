@@ -96,10 +96,10 @@ def parse(String rawEvent) {
     def body = parsedEvent.json
     switch(body?.type) {
         case "state":
-            if(parsedEvent?.json?.value == 255) {
-                sendEvent(name: "switch", value: "on")
-            } else {
+            if(parsedEvent?.json?.value == 0) {
                 sendEvent(name: "switch", value: "off")
+            } else {
+                sendEvent(name: "switch", value: "on")
             }
             break;
     }
@@ -111,14 +111,26 @@ def parse(String rawEvent) {
 // handle commands
 def on() {
     log.debug "Executing 'on'"
+    
+    def builder = new groovy.json.JsonBuilder()
+    def root = builder {
+    	feature_name "${getDataValue("id")}"
+        command_type "Set"
+        data {
+            value 255
+        }
+    }
+    def path = "/commands"
+    def headers = [:] 
+    headers.put("HOST", getHostAddress())
+    headers.put("content-type", "application/json")
+
     new physicalgraph.device.HubAction(
-      [
-            method: "GET",
-            path: "/command",
-            headers: [
-                HOST: getHostAddress()
-            ],
-            query: [type: "set", value: "255", name: getDataValue("id")]
+      	[
+            method: "POST",
+            path: path,
+            headers: headers,
+            body: root,
         ],
         getDNI(),
         [
@@ -134,14 +146,26 @@ def handleOn(physicalgraph.device.HubResponse hubResponse) {
 
 def off() {
     log.debug "Executing 'off'"
+    
+    def builder = new groovy.json.JsonBuilder()
+    def root = builder {
+    	feature_name "${getDataValue("id")}"
+        command_type "Set"
+        data {
+            value 0
+        }
+    }
+    def path = "/commands"
+    def headers = [:] 
+    headers.put("HOST", getHostAddress())
+    headers.put("content-type", "application/json")
+
     new physicalgraph.device.HubAction(
-      [
-            method: "GET",
-            path: "/command",
-            headers: [
-                HOST: getHostAddress()
-            ],
-            query: [type: "set", value: "0", name: getDataValue("id")]
+      	[
+            method: "POST",
+            path: path,
+            headers: headers,
+            body: root,
         ],
         getDNI(),
         [
@@ -161,18 +185,36 @@ def subscribe() {
 
 def subscribe(hostAddress) {
     log.debug "Executing 'subscribe()'"
-    def address = getCallBackAddress()
+
+	def address = getCallBackAddress()
+    def builder = new groovy.json.JsonBuilder()
+    def root = builder {
+        feature_name getDataValue("id")
+        event_type "State"
+        callback "http://${address}/notify"
+        timeout 3600
+    }
+    def path = "/subscriptions"
+    def headers = [:] 
+    headers.put("HOST", getHostAddress())
+    headers.put("content-type", "application/json")
+
     new physicalgraph.device.HubAction(
-        method: "GET",
-        path: "/subscribe",
-        headers: [
-            HOST: "${hostAddress}",
-            CALLBACK: "<http://${address}/notify>",
-            NT: "upnp:event",
-            TIMEOUT: "Second-3600"
+      	[
+            method: "POST",
+            path: path,
+            headers: headers,
+            body: root,
         ],
-        query: [type: "state", name: getDataValue("id")]
+        getDNI(),
+        [
+            callback: handleSubscribe
+        ]
     )
+}
+
+def handleSubscribe(physicalgraph.device.HubResponse hubResponse) {
+    log.debug "handleSubscribe()"
 }
 
 def refresh() {
@@ -214,14 +256,22 @@ def poll() {
     if (device.currentValue("currentIP") != "Offline") {
         runIn(30, setOffline)
     }
+    def builder = new groovy.json.JsonBuilder()
+    def root = builder {
+    	feature_name "${getDataValue("id")}"
+        command_type "Get"
+    }
+    def path = "/commands"
+    def headers = [:] 
+    headers.put("HOST", getHostAddress())
+    headers.put("content-type", "application/json")
+
     new physicalgraph.device.HubAction(
-      [
-            method: "GET",
-            path: "/command",
-            headers: [
-                HOST: getHostAddress()
-            ],
-            query: [type: "get", name: getDataValue("id")]
+      	[
+            method: "POST",
+            path: path,
+            headers: headers,
+            body: root,
         ],
         getDNI(),
         [
@@ -234,10 +284,10 @@ def handlePoll(physicalgraph.device.HubResponse hubResponse) {
     log.debug "Executing 'handlePoll()'"
     unschedule("setOffline")
     def body = hubResponse.json
-    if(body?.value == 255) {
-        sendEvent(name: "switch", value: "on")
-    } else {
+    if(body?.value == 0) {
         sendEvent(name: "switch", value: "off")
+    } else {
+        sendEvent(name: "switch", value: "on")
     }
 }
 
