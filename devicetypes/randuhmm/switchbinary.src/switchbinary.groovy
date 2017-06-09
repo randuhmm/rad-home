@@ -122,7 +122,7 @@ def on() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress)
+    headers.put('HOST', getHostAddress())
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -139,7 +139,7 @@ def on() {
     )
 }
 
-def handleOn() {
+def handleOn(hubResponse) {
     log.debug 'handleOn():'
     sendEvent(name: 'switch', value: 'on')
 }
@@ -157,7 +157,7 @@ def off() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress)
+    headers.put('HOST', getHostAddress())
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -174,13 +174,13 @@ def off() {
     )
 }
 
-def handleOff() {
+def handleOff(hubResponse) {
     log.debug 'handleOff()'
     sendEvent(name: 'switch', value: 'off')
 }
 
 def subscribe() {
-    subscribe(getHostAddress)
+    subscribe(getHostAddress())
 }
 
 def subscribe(hostAddress) {
@@ -190,7 +190,7 @@ def subscribe(hostAddress) {
     def root = builder {
         feature_name getDataValue('id')
         event_type 'State'
-        callback "http://${getCallBackAddress}/notify"
+        callback "http://${getCallBackAddress()}/notify"
         timeout 3600
     }
     def path = '/subscriptions'
@@ -212,7 +212,7 @@ def subscribe(hostAddress) {
     )
 }
 
-def handleSubscribe() {
+def handleSubscribe(hubResponse) {
     log.debug 'handleSubscribe()'
 }
 
@@ -262,7 +262,7 @@ def poll() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress)
+    headers.put('HOST', getHostAddress())
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -279,7 +279,7 @@ def poll() {
     )
 }
 
-def handlePoll(physicalgraph.device.HubResponse hubResponse) {
+def handlePoll(hubResponse) {
     log.debug 'Executing "handlePoll()"'
     unschedule('setOffline')
     def body = hubResponse.json
@@ -312,7 +312,7 @@ def getCallBackAddress() {
 }
 
 // gets the address of the device
-private getHostAddress() {
+def getHostAddress() {
     def ip = getDataValue('ip')
     def port = getDataValue('port')
 
