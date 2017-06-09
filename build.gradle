@@ -1,0 +1,27 @@
+apply plugin: 'groovy'
+apply plugin: 'codenarc'
+
+repositories {
+    jcenter() 
+}
+
+codenarc {
+    configFile = new File('codenarc-rules.groovy')
+    reportFormat = 'html'
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['devicetypes', 'smartapps']
+        }
+    }
+    test {
+        groovy {
+            srcDirs = ['test/groovy']
+        }
+    }
+}
+
+compileGroovy.enabled = false
+compileTestGroovy.enabled = false

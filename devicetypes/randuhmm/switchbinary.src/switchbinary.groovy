@@ -18,73 +18,73 @@
  */
 metadata {
 
-    definition (name: "SwitchBinary", namespace: "randuhmm",
-                author: "Jonny Morrill") {
-        capability "Actuator"
-        capability "Polling"
-        capability "Refresh"
-        capability "Sensor"
-        capability "Switch"
+    definition (name: 'SwitchBinary', namespace: 'randuhmm',
+                author: 'Jonny Morrill') {
+        capability 'Actuator'
+        capability 'Polling'
+        capability 'Refresh'
+        capability 'Sensor'
+        capability 'Switch'
 
-        attribute "currentIP", "string"
+        attribute 'currentIP', 'string'
 
-        command "subscribe"
-        //command "resubscribe"
-        //command "unsubscribe"
-        command "setOffline"
+        command 'subscribe'
+        //command 'resubscribe'
+        //command 'unsubscribe'
+        command 'setOffline'
     }
 
     simulator { }
 
     tiles(scale: 2) {
 
-        multiAttributeTile(name:"rich-control", type: "switch",
+        multiAttributeTile(name:'rich-control', type: 'switch',
                            canChangeIcon: true) {
-            tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-                attributeState "on", label:'${name}', action:"switch.off",
-                    icon:"st.switches.switch.off", backgroundColor:"#79b821",
-                    nextState:"turningOff"
-                attributeState "off", label:'${name}', action:"switch.on",
-                    icon:"st.switches.switch.on", backgroundColor:"#ffffff",
-                    nextState:"turningOn"
-                attributeState "turningOn", label:'${name}',
-                    action:"switch.off", icon:"st.switches.switch.off",
-                    backgroundColor:"#79b821", nextState:"turningOff"
-                attributeState "turningOff", label:'${name}',
-                    action:"switch.on", icon:"st.switches.switch.on",
-                    backgroundColor:"#ffffff", nextState:"turningOn"
-                attributeState "offline", label:'${name}',
-                    icon:"st.switches.switch.off", backgroundColor:"#ff0000"
+            tileAttribute ('device.switch', key: 'PRIMARY_CONTROL') {
+                attributeState 'on', label:'${name}', action:'switch.off',
+                    icon:'st.switches.switch.off', backgroundColor:'#79b821',
+                    nextState:'turningOff'
+                attributeState 'off', label:'${name}', action:'switch.on',
+                    icon:'st.switches.switch.on', backgroundColor:'#ffffff',
+                    nextState:'turningOn'
+                attributeState 'turningOn', label:'${name}',
+                    action:'switch.off', icon:'st.switches.switch.off',
+                    backgroundColor:'#79b821', nextState:'turningOff'
+                attributeState 'turningOff', label:'${name}',
+                    action:'switch.on', icon:'st.switches.switch.on',
+                    backgroundColor:'#ffffff', nextState:'turningOn'
+                attributeState 'offline', label:'${name}',
+                    icon:'st.switches.switch.off', backgroundColor:'#ff0000'
             }
-            tileAttribute ("currentIP", key: "SECONDARY_CONTROL") {
-                attributeState "currentIP", label: ''
+            tileAttribute ('currentIP', key: 'SECONDARY_CONTROL') {
+                attributeState 'currentIP', label: ''
             }
         }
 
-        standardTile("switch", "device.switch", width: 2, height: 2,
+        standardTile('switch', 'device.switch', width: 2, height: 2,
                      canChangeIcon: true) {
-            state "on", label:'${name}', action:"switch.off",
-                icon:"st.switches.switch.off", backgroundColor:"#79b821",
-                nextState:"turningOff"
-            state "off", label:'${name}', action:"switch.on",
-                icon:"st.switches.switch.on", backgroundColor:"#ffffff",
-                nextState:"turningOn"
-            state "turningOn", label:'${name}', action:"switch.off",
-                icon:"st.switches.switch.off", backgroundColor:"#79b821",
-                nextState:"turningOff"
-            state "turningOff", label:'${name}', action:"switch.on",
-                icon:"st.switches.switch.on", backgroundColor:"#ffffff",
-                nextState:"turningOn"
-            state "offline", label:'${name}', icon:"st.switches.switch.off",
-                backgroundColor:"#ff0000"
+            state 'on', label:'${name}', action:'switch.off',
+                icon:'st.switches.switch.off', backgroundColor:'#79b821',
+                nextState:'turningOff'
+            state 'off', label:'${name}', action:'switch.on',
+                icon:'st.switches.switch.on', backgroundColor:'#ffffff',
+                nextState:'turningOn'
+            state 'turningOn', label:'${name}', action:'switch.off',
+                icon:'st.switches.switch.off', backgroundColor:'#79b821',
+                nextState:'turningOff'
+            state 'turningOff', label:'${name}', action:'switch.on',
+                icon:'st.switches.switch.on', backgroundColor:'#ffffff',
+                nextState:'turningOn'
+            state 'offline', label:'${name}', icon:'st.switches.switch.off',
+                backgroundColor:'#ff0000'
         }
-        standardTile("refresh", "device.switch", inactiveLabel: false,
-                     height: 2, width: 2, decoration: "flat") {
-            state "default", label:"", action:"refresh.refresh",
-                icon:"st.secondary.refresh"
+        standardTile('refresh', 'device.switch', inactiveLabel: false,
+                     height: 2, width: 2, decoration: 'flat') {
+            state 'default', label:'', action:'refresh.refresh',
+                icon:'st.secondary.refresh'
         }
-        main(["switch"])
-        details(["rich-control", "refresh"])
+        main(['switch'])
+        details(['rich-control', 'refresh'])
     }
 }
 
@@ -95,13 +95,13 @@ def parse(String rawEvent) {
     
     def body = parsedEvent.json
     switch(body?.type) {
-        case "state":
+        case 'state':
             if(parsedEvent?.json?.value == 0) {
-                sendEvent(name: "switch", value: "off")
+                sendEvent(name: 'switch', value: 'off')
             } else {
-                sendEvent(name: "switch", value: "on")
+                sendEvent(name: 'switch', value: 'on')
             }
-            break;
+            break
     }
 }
 
@@ -110,170 +110,169 @@ def parse(String rawEvent) {
 
 // handle commands
 def on() {
-    log.debug "Executing 'on'"
+    log.debug 'Executing "on"'
     
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue("id")}"
-        command_type "Set"
+    	feature_name "${getDataValue('id')}"
+        command_type 'Set'
         data {
             value 255
         }
     }
-    def path = "/commands"
+    def path = '/commands'
     def headers = [:] 
-    headers.put("HOST", getHostAddress())
-    headers.put("content-type", "application/json")
+    headers.put('HOST', getHostAddress)
+    headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
       	[
-            method: "POST",
+            method: 'POST',
             path: path,
             headers: headers,
             body: root,
         ],
-        getDNI(),
+        getDNI,
         [
             callback: handleOn
         ]
     )
 }
 
-def handleOn(physicalgraph.device.HubResponse hubResponse) {
-    log.debug "handleOn():"
-    sendEvent(name: "switch", value: "on")
+def handleOn() {
+    log.debug 'handleOn():'
+    sendEvent(name: 'switch', value: 'on')
 }
 
 def off() {
-    log.debug "Executing 'off'"
+    log.debug 'Executing "off"'
     
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue("id")}"
-        command_type "Set"
+    	feature_name "${getDataValue('id')}"
+        command_type 'Set'
         data {
             value 0
         }
     }
-    def path = "/commands"
+    def path = '/commands'
     def headers = [:] 
-    headers.put("HOST", getHostAddress())
-    headers.put("content-type", "application/json")
+    headers.put('HOST', getHostAddress)
+    headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
       	[
-            method: "POST",
+            method: 'POST',
             path: path,
             headers: headers,
             body: root,
         ],
-        getDNI(),
+        getDNI,
         [
             callback: handleOff
         ]
     )
 }
 
-def handleOff(physicalgraph.device.HubResponse hubResponse) {
-    log.debug "handleOff()"
-    sendEvent(name: "switch", value: "off")
+def handleOff() {
+    log.debug 'handleOff()'
+    sendEvent(name: 'switch', value: 'off')
 }
 
 def subscribe() {
-    subscribe(getHostAddress())
+    subscribe(getHostAddress)
 }
 
 def subscribe(hostAddress) {
-    log.debug "Executing 'subscribe()'"
+    log.debug 'Executing "subscribe()"'
 
-	def address = getCallBackAddress()
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-        feature_name getDataValue("id")
-        event_type "State"
-        callback "http://${address}/notify"
+        feature_name getDataValue('id')
+        event_type 'State'
+        callback "http://${getCallBackAddress}/notify"
         timeout 3600
     }
-    def path = "/subscriptions"
+    def path = '/subscriptions'
     def headers = [:] 
-    headers.put("HOST", getHostAddress())
-    headers.put("content-type", "application/json")
+    headers.put('HOST', hostAddress)
+    headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
       	[
-            method: "POST",
+            method: 'POST',
             path: path,
             headers: headers,
             body: root,
         ],
-        getDNI(),
+        getDNI,
         [
             callback: handleSubscribe
         ]
     )
 }
 
-def handleSubscribe(physicalgraph.device.HubResponse hubResponse) {
-    log.debug "handleSubscribe()"
+def handleSubscribe() {
+    log.debug 'handleSubscribe()'
 }
 
 def refresh() {
-      log.debug "Executing 'subscribe', then 'poll'"
+      log.debug 'Executing "subscribe", then "poll"'
       [subscribe(), poll()]
 }
 
 def subscribe(ip, port) {
-    def existingIp = getDataValue("ip")
-    def existingPort = getDataValue("port")
+    def existingIp = getDataValue('ip')
+    def existingPort = getDataValue('port')
     if (ip && ip != existingIp) {
          log.debug "Updating ip from $existingIp to $ip"    
-       updateDataValue("ip", ip)
-       def ipvalue = convertHexToIP(getDataValue("ip"))
-         sendEvent(name: "currentIP", value: ipvalue,
+       updateDataValue('ip', ip)
+       def ipvalue = convertHexToIP(getDataValue('ip'))
+         sendEvent(name: 'currentIP', value: ipvalue,
                    descriptionText: "IP changed to ${ipvalue}")
     }
     if (port && port != existingPort) {
         log.debug "Updating port from $existingPort to $port"
-        updateDataValue("port", port)
+        updateDataValue('port', port)
     }
     subscribe("${ip}:${port}")
 }
 
 def sync(ip, port) {
-    log.debug "Executing 'sync()'"
-    def existingIp = getDataValue("ip")
-    def existingPort = getDataValue("port")
+    log.debug 'Executing "sync()"'
+    def existingIp = getDataValue('ip')
+    def existingPort = getDataValue('port')
     if (ip && ip != existingIp) {
-        updateDataValue("ip", ip)
+        updateDataValue('ip', ip)
     }
     if (port && port != existingPort) {
-        updateDataValue("port", port)
+        updateDataValue('port', port)
     }
 }
 
 def poll() {
-    log.debug "Executing 'poll()'"
-    if (device.currentValue("currentIP") != "Offline") {
+    log.debug 'Executing "poll()"'
+    if (device.currentValue('currentIP') != 'Offline') {
         runIn(30, setOffline)
     }
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue("id")}"
-        command_type "Get"
+    	feature_name "${getDataValue('id')}"
+        command_type 'Get'
     }
-    def path = "/commands"
+    def path = '/commands'
     def headers = [:] 
-    headers.put("HOST", getHostAddress())
-    headers.put("content-type", "application/json")
+    headers.put('HOST', getHostAddress)
+    headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
       	[
-            method: "POST",
+            method: 'POST',
             path: path,
             headers: headers,
             body: root,
         ],
-        getDNI(),
+        getDNI,
         [
             callback: handlePoll
         ]
@@ -281,24 +280,24 @@ def poll() {
 }
 
 def handlePoll(physicalgraph.device.HubResponse hubResponse) {
-    log.debug "Executing 'handlePoll()'"
-    unschedule("setOffline")
+    log.debug 'Executing "handlePoll()"'
+    unschedule('setOffline')
     def body = hubResponse.json
     if(body?.value == 0) {
-        sendEvent(name: "switch", value: "off")
+        sendEvent(name: 'switch', value: 'off')
     } else {
-        sendEvent(name: "switch", value: "on")
+        sendEvent(name: 'switch', value: 'on')
     }
 }
 
-private getDNI() {
-    return getDataValue('mac') + "." + getDataValue('id')
+def getDNI() {
+    getDataValue('mac') + '.' + getDataValue('id')
 }
 
 def setOffline() {
-    log.debug "Executing 'setOffline()'"
-    sendEvent(name: "switch", value: "offline",
-              descriptionText: "The device is offline")
+    log.debug 'Executing "setOffline()"'
+    sendEvent(name: 'switch', value: 'offline',
+              descriptionText: 'The device is offline')
 }
 
 // =============================================================================
@@ -307,18 +306,18 @@ def setOffline() {
 
 
 // gets the address of the hub
-private getCallBackAddress() {
-    return device.hub.getDataValue("localIP") + ":" +
-        device.hub.getDataValue("localSrvPortTCP")
+def getCallBackAddress() {
+    device.hub.getDataValue('localIP') + ':' +
+        device.hub.getDataValue('localSrvPortTCP')
 }
 
 // gets the address of the device
 private getHostAddress() {
-    def ip = getDataValue("ip")
-    def port = getDataValue("port")
+    def ip = getDataValue('ip')
+    def port = getDataValue('port')
 
     if (!ip || !port) {
-        def parts = device.deviceNetworkId.split(":")
+        def parts = device.deviceNetworkId.split(':')
         if (parts.length == 2) {
             ip = parts[0]
             port = parts[1]
@@ -328,18 +327,18 @@ private getHostAddress() {
     }
 
     log.debug "Using IP: $ip and port: $port for device: ${device.id}"
-    return convertHexToIP(ip) + ":" + convertHexToInt(port)
+    convertHexToIP(ip) + ':' + convertHexToInt(port)
 }
 
 private Integer convertHexToInt(hex) {
-    return Integer.parseInt(hex,16)
+    Integer.parseInt(hex,16)
 }
 
 private String convertHexToIP(hex) {
-    return [
+    [
         convertHexToInt(hex[0..1]),
         convertHexToInt(hex[2..3]),
         convertHexToInt(hex[4..5]),
         convertHexToInt(hex[6..7])
-    ].join(".")
+    ].join('.')
 }

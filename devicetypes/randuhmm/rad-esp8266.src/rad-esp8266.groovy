@@ -18,22 +18,22 @@
  */
 metadata {
 
-    definition (name: "RAD-ESP8266", namespace: "randuhmm",
-                author: "Jonny Morrill") {
-        capability "Polling"
-        capability "Refresh"
+    definition (name: 'RAD-ESP8266', namespace: 'randuhmm',
+                author: 'Jonny Morrill') {
+        capability 'Polling'
+        capability 'Refresh'
     }
 
     simulator {}
 
     tiles {
-        standardTile("refresh", "device.refresh", inactiveLabel: false,
-                     decoration: "flat") {
-            state "default", action:"refresh.refresh",
-                icon: "st.secondary.refresh"
+        standardTile('refresh', 'device.refresh', inactiveLabel: false,
+                     decoration: 'flat') {
+            state 'default', action:'refresh.refresh',
+                icon: 'st.secondary.refresh'
         }
-        main (["refresh"])
-        details(["refresh"])
+        main (['refresh'])
+        details(['refresh'])
     }
 }
 
@@ -49,48 +49,5 @@ def parse(String rawEvent) {
 }
 
 def refresh() {
-    log.debug "Executing 'refresh()'"
-}
-
-
-// =============================================================================
-// Helper Methods Below This Line
-// =============================================================================
-
-// gets the address of the hub
-private getCallBackAddress() {
-    return device.hub.getDataValue("localIP") + ":" +
-        device.hub.getDataValue("localSrvPortTCP")
-}
-
-// gets the address of the device
-private getHostAddress() {
-    def ip = getDataValue("ip")
-    def port = getDataValue("port")
-
-    if (!ip || !port) {
-        def parts = device.deviceNetworkId.split(":")
-        if (parts.length == 2) {
-            ip = parts[0]
-            port = parts[1]
-        } else {
-            log.warn "Can't figure out ip and port for device: ${device.id}"
-        }
-    }
-
-    log.debug "Using IP: $ip and port: $port for device: ${device.id}"
-    return convertHexToIP(ip) + ":" + convertHexToInt(port)
-}
-
-private Integer convertHexToInt(hex) {
-    return Integer.parseInt(hex,16)
-}
-
-private String convertHexToIP(hex) {
-    return [
-        convertHexToInt(hex[0..1]),
-        convertHexToInt(hex[2..3]),
-        convertHexToInt(hex[4..5]),
-        convertHexToInt(hex[6..7])
-    ].join(".")
+    log.debug 'Executing "refresh()"'
 }
