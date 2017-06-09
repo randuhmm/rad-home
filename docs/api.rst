@@ -20,8 +20,12 @@ devices that have a simple binary state.
 
 SwitchMultiLevel: This is for switches that can change intensity (dimmable). It
 can be used to control any device that takes multi-level input.
-  - ``SwitchHue``
-  - ``SwitchDimmable``
+
+SwitchBinaryColor: This is a switch that can be used to control color output as well
+as whether the device is powered or not.
+
+SwitchMultiLevelColor: This is a switch that can be used to control color output
+as well as the level of intesity.
 
 Trigger: This is a trigger feature that can be called without any parameters. It
 can be used to trigger a command or something on the device that is stateless.
@@ -36,7 +40,6 @@ SensorBinary: This feature enables a sensor that has a simple binary state.
 SensorMultiLevel:
   - ``SensorTemperature``
   - ``SensorHumidity``
-
 
 
 Commands
@@ -124,20 +127,16 @@ Features
       [
           {
               "feature_name": "switch_1",
-              "feature_type": "SwitchBinary",
-              "metadata: {}
+              "feature_type": "SwitchBinary"
           },
           {
               "feature_name": "switch_2",
-              "feature_type": "SwitchMultiLevel",
-              "metadata": {
-                  "STDeviceHandler": "SwitchHue"
-              }
+              "feature_type": "SwitchMultiLevel"
           }
       ]
 
-   :>jsonarr string name: The feature name
-   :>jsonarr string type: The feature type
+   :>jsonarr string feature_name: The feature name
+   :>jsonarr string feature_type: The feature type
    :status 200: no error
    :status 500: error
 
