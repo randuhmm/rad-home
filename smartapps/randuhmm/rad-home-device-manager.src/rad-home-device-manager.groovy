@@ -150,27 +150,31 @@ def addDevices() {
         }
 
         if (!d) {
-            log.debug "Creating Generic UPnP Device with dni: ${selectedDevice.value.mac}"
-            addChildDevice('randuhmm', 'RAD-ESP8266', selectedDevice.value.mac, selectedDevice?.value.hub, [
-                'label': selectedDevice?.value?.name ?: 'RAD-ESP8266',
-                'data': [
-                    'mac': selectedDevice.value.mac,
-                    'ip': selectedDevice.value.networkAddress,
-                    'port': selectedDevice.value.deviceAddress
+            log.debug 'Creating Generic UPnP Device with ' +
+                "dni: ${selectedDevice.value.mac}"
+            addChildDevice('randuhmm', 'RAD-ESP8266', selectedDevice.value.mac,
+                selectedDevice?.value.hub, [
+                    'label': selectedDevice?.value?.name ?: 'RAD-ESP8266',
+                    'data': [
+                        'mac': selectedDevice.value.mac,
+                        'ip': selectedDevice.value.networkAddress,
+                        'port': selectedDevice.value.deviceAddress
                 ]
             ])
             
             selectedDevice?.value?.devices.each { rd ->
             	def rdDni = "${selectedDevice.value.mac}-${rd.feature_name}"
-                addChildDevice('randuhmm', rd.feature_type, rdDni, selectedDevice?.value.hub, [
-                    'label': rd?.feature_name ?: rd.feature_type ,
-                    'data': [
-                    	'id': rd.feature_name,
-                        'mac': selectedDevice.value.mac,
-                        'ip': selectedDevice.value.networkAddress,
-                        'port': selectedDevice.value.deviceAddress
+                addChildDevice('randuhmm', rd.feature_type, rdDni,
+                    selectedDevice?.value.hub, [
+                        'label': rd?.feature_name ?: rd.feature_type ,
+                        'data': [
+                            'id': rd.feature_name,
+                            'mac': selectedDevice.value.mac,
+                            'ip': selectedDevice.value.networkAddress,
+                            'port': selectedDevice.value.deviceAddress
+                        ]
                     ]
-                ])
+                )
             }
         }
     }
@@ -189,12 +193,14 @@ def ssdpHandler(evt) {
     log.debug "ssdpUSN = ${ssdpUSN}"
     if (devices."${ssdpUSN}") {
         def d = devices."${ssdpUSN}"
-        if (d.networkAddress != parsedEvent.networkAddress || d.deviceAddress != parsedEvent.deviceAddress) {
+        if (d.networkAddress != parsedEvent.networkAddress ||
+            d.deviceAddress != parsedEvent.deviceAddress) {
             d.networkAddress = parsedEvent.networkAddress
             d.deviceAddress = parsedEvent.deviceAddress
             def child = getChildDevice(parsedEvent.mac)
             if (child) {
-                child.sync(parsedEvent.networkAddress, parsedEvent.deviceAddress)
+                child.sync(parsedEvent.networkAddress,
+                           parsedEvent.deviceAddress)
             }
         }
     } else {
