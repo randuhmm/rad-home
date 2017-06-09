@@ -34,6 +34,7 @@ def deviceDiscovery() {
     def devices = getVerifiedDevices()
     devices.each {
         def value = it.value.name ?: "UPnP Device ${it.value.ssdpUSN.split(':')[1][-3..-1]}"
+        value = "${value} - ${it.value.model}"
         def key = it.value.mac
         options["${key}"] = value
     }
@@ -79,17 +80,6 @@ void ssdpDiscover() {
 
 void ssdpSubscribe() {
     subscribe(location, "ssdpTerm.urn:rad:device:esp8266:1", ssdpHandler)
-}
-
-Map verifiedDevices() {
-    def devices = getVerifiedDevices()
-    def map = [:]
-    devices.each {
-        def value = it.value.name ?: "UPnP Device ${it.value.ssdpUSN.split(':')[1][-3..-1]}"
-        def key = it.value.mac
-        map["${key}"] = value
-    }
-    map
 }
 
 void verifyDevices() {
