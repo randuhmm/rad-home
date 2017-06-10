@@ -122,7 +122,7 @@ def on() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress())
+    headers.put('HOST', hostAddress)
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -132,14 +132,14 @@ def on() {
             headers: headers,
             body: root,
         ],
-        getDNI,
+        deviceNameID,
         [
             callback: handleOn
         ]
     )
 }
 
-def handleOn(hubResponse) {
+def handleOn() {
     log.debug 'handleOn():'
     sendEvent(name: 'switch', value: 'on')
 }
@@ -157,7 +157,7 @@ def off() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress())
+    headers.put('HOST', hostAddress)
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -167,20 +167,20 @@ def off() {
             headers: headers,
             body: root,
         ],
-        getDNI,
+        deviceNameID,
         [
             callback: handleOff
         ]
     )
 }
 
-def handleOff(hubResponse) {
+def handleOff() {
     log.debug 'handleOff()'
     sendEvent(name: 'switch', value: 'off')
 }
 
 def subscribe() {
-    subscribe(getHostAddress())
+    subscribe(hostAddress)
 }
 
 def subscribe(hostAddress) {
@@ -190,7 +190,7 @@ def subscribe(hostAddress) {
     def root = builder {
         feature_name getDataValue('id')
         event_type 'State'
-        callback "http://${getCallBackAddress()}/notify"
+        callback "http://${callBackAddress}/notify"
         timeout 3600
     }
     def path = '/subscriptions'
@@ -205,14 +205,14 @@ def subscribe(hostAddress) {
             headers: headers,
             body: root,
         ],
-        getDNI,
+        deviceNameID,
         [
             callback: handleSubscribe
         ]
     )
 }
 
-def handleSubscribe(hubResponse) {
+def handleSubscribe() {
     log.debug 'handleSubscribe()'
 }
 
@@ -262,7 +262,7 @@ def poll() {
     }
     def path = '/commands'
     def headers = [:] 
-    headers.put('HOST', getHostAddress())
+    headers.put('HOST', hostAddress)
     headers.put('content-type', 'application/json')
 
     new physicalgraph.device.HubAction(
@@ -272,14 +272,14 @@ def poll() {
             headers: headers,
             body: root,
         ],
-        getDNI,
+        deviceNameID,
         [
             callback: handlePoll
         ]
     )
 }
 
-def handlePoll(hubResponse) {
+def handlePoll(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'Executing "handlePoll()"'
     unschedule('setOffline')
     def body = hubResponse.json
@@ -290,8 +290,8 @@ def handlePoll(hubResponse) {
     }
 }
 
-def getDNI() {
-    getDataValue('mac') + '.' + getDataValue('id')
+def getDeviceNameID() {
+    getDataValue('mac') + '-' + getDataValue('id')
 }
 
 def setOffline() {
@@ -312,7 +312,7 @@ def getCallBackAddress() {
 }
 
 // gets the address of the device
-def getHostAddress() {
+private getHostAddress() {
     def ip = getDataValue('ip')
     def port = getDataValue('port')
 
