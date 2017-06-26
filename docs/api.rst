@@ -89,7 +89,13 @@ HTTP Specification
           "model": "RAD-ESP8266",
           "description": "Rad ESP8266 WiFi Module for IoT Integration",
           "serial": "ABD123",
-          "UDN": "38323636-4558-4dda-9188-cd1234567890"
+          "UDN": "38323636-4558-4dda-9188-cd1234567890",
+          "links": {
+              "features": "/features",
+              "commands": "/commands",
+              "events": "/events",
+              "subscriptions": "/subscriptions"
+          }
       }
 
    :>json string name: The name of the ESP8266
@@ -126,17 +132,75 @@ Features
 
       [
           {
-              "feature_name": "switch_1",
-              "feature_type": "SwitchBinary"
+              "id": "switch_1",
+              "type": "SwitchBinary",
+              "name": "My Switch",
+              "description": "This is a switch",
+              "links": {
+                  "detail": "/features/switch_1",
+                  "commands": "/features/switch_1/commands",
+                  "events": "/features/switch_1/events",
+                  "subscriptions": "/features/switch_1/subscriptions"
+              }
           },
           {
-              "feature_name": "switch_2",
-              "feature_type": "SwitchMultiLevel"
+              "id": "switch_2",
+              "type": "SwitchMultiLevel",
+              "name": "My Dimmer"
+              "description": "This is a dimmable switch",
+              "links": {
+                  "detail": "/features/switch_2",
+                  "commands": "/features/switch_2/commands",
+                  "events": "/features/switch_2/events",
+                  "subscriptions": "/features/switch_2/subscriptions"
+              }
           }
       ]
 
-   :>jsonarr string feature_name: The feature name
-   :>jsonarr string feature_type: The feature type
+   :>jsonarr string id: The feature id
+   :>jsonarr string name: The feature name
+   :>jsonarr string type: The feature type
+   :>jsonarr string description: The feature description
+   :status 200: no error
+   :status 500: error
+
+
+.. http:get:: /features/{feature_id}
+
+   Get feature details
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /features/switch_1 HTTP/1.1
+      Host: example.com
+      Content-Type: application/json
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+
+      {
+          "id": "switch_1",
+          "type": "SwitchBinary",
+          "name": "My Switch",
+          "description": "This is a switch",
+          "links": {
+              "features": "/features",
+              "commands": "/features/switch_1/commands",
+              "events": "/features/switch_1/events",
+              "subscriptions": "/features/switch_1/subscriptions"
+          }
+      }
+
+   :>json string id: The feature id
+   :>json string name: The feature name
+   :>json string type: The feature type
+   :>json string description: The feature description
    :status 200: no error
    :status 500: error
 
@@ -157,8 +221,8 @@ Commands
       Content-Type: application/json
 
       {
-          "feature_name": "switch_1",
           "command_type": "Set",
+          "feature_id": "switch_1",
           "data": {
               "value": true
           }
@@ -171,8 +235,8 @@ Commands
       HTTP/1.1 200 OK
       Content-Type: text/javascript
 
-   :<json string feature_name: The name of the target feature
    :<json string command_type: The type of command
+   :<json string feature_id: The id of the target feature
    :<json object data: The data for the command
    :status 200: no error
    :status 400: when form parameters are missing
@@ -203,26 +267,34 @@ Subscriptions
 
       [
           {
-              "feature_name": "switch_1",
+              "id": "123456",
+              "feature_id": "switch_1",
               "event_type": "State",
               "callback": "http://my-server.local:8000/notify",
               "timeout": 3600,
               "duration": 250,
               "calls": 10,
-              "errors": 0
+              "errors": 0,
+              "links": {
+                  "feature": "/features/switch_1"
+              }
           },
           {
-              "feature_name": "switch_2",
+              "id": "1234567",
+              "feature_id": "switch_2",
               "event_type": "State",
               "callback": "http://my-server.local:8000/notify",
               "timeout": 3600,
               "duration": 3000,
               "calls": 200,
-              "errors": 1
+              "errors": 1,
+              "links": {
+                  "feature": "/features/switch_2"
+              }
           }
       ]
 
-   :>jsonarr string feature_name: The name of the target feature
+   :>jsonarr string feature_id: The target feature
    :>jsonarr string event_type: The type of event
    :>jsonarr string callback: The HTTP callback
    :>jsonarr int timeout: The timeout value
@@ -245,7 +317,7 @@ Subscriptions
       Content-Type: application/json
 
       {
-          "feature_name": "switch_1",
+          "feature_id": "switch_1",
           "event_type": "State",
           "callback": "http://my-server.local:8000/notify",
           "timeout": 3600
@@ -258,7 +330,7 @@ Subscriptions
       HTTP/1.1 200 OK
       Content-Type: text/javascript
 
-   :<json string feature_name: The device to use
+   :<json string feature_id: The target feature
    :<json string event_type: The type of event to subscribe to
    :<json string callback: The callback to call when the event occurs
    :<json integer timeout: The timeout in seconds
