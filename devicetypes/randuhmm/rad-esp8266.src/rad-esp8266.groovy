@@ -41,8 +41,8 @@ metadata {
 def parse(String rawEvent) {
     log.debug "${rawEvent}"
     def parsedEvent = parseLanMessage(rawEvent)
-    if(parsedEvent.headers.containsKey('RAD-NAME')) {
-        def name = parsedEvent.headers['RAD-NAME']
+    if(parsedEvent.headers.containsKey('RAD-ID')) {
+        def name = parsedEvent.headers['RAD-ID']
         parent.dispatchEvent(name, parsedEvent.mac, rawEvent)
     }
     []

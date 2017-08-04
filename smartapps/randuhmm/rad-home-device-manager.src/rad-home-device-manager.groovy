@@ -172,14 +172,15 @@ def addDevices() {
                         'port': selectedDevice.value.deviceAddress
                 ]
             ])
-            
-            selectedDevice?.value?.devices.each { rd ->
-            	def rdDni = "${selectedDevice.value.mac}-${rd.feature_name}"
-                addChildDevice('randuhmm', rd.feature_type, rdDni,
+
+            selectedDevice?.value?.feature.each { rd ->
+            	def rdDni = "${selectedDevice.value.mac}-${rd.id}"
+                addChildDevice('randuhmm', rd.type, rdDni,
                     selectedDevice?.value.hub, [
-                        'label': rd?.feature_name ?: rd.feature_type ,
+                        'label': rd?.name ?: (rd?.id ?: rd.type),
                         'data': [
-                            'id': rd.feature_name,
+                            'id': rd.id,
+                            'name': rd.name,
                             'mac': selectedDevice.value.mac,
                             'ip': selectedDevice.value.networkAddress,
                             'port': selectedDevice.value.deviceAddress
@@ -239,19 +240,19 @@ void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
         sendHubCommand(new physicalgraph.device.HubAction(
         	"""GET /features HTTP/1.1\r\nHOST: $host\r\n\r\n""",
             physicalgraph.device.Protocol.LAN, host,
-            [callback: deviceDevicesHandler]))
+            [callback: deviceFeaturesHandler]))
     }
 }
 
-def deviceDevicesHandler(physicalgraph.device.HubResponse hubResponse) {
-    log.debug 'deviceDevicesHandler()'
+def deviceFeaturesHandler(physicalgraph.device.HubResponse hubResponse) {
+    log.debug 'deviceFeaturesHandler()'
     log.debug "${hubResponse}"
     log.debug "${hubResponse.body}"
-    def jsonDevices = hubResponse.json
+    def jsonFeatures = hubResponse.json
     def device = devices.find { it?.value?.mac == hubResponse.mac }
     if (device) {
         device.value << [
-            devices: jsonDevices,
+            features: jsonFeatures,
             verified: true,
         ]
     }
