@@ -96,10 +96,10 @@ def parse(String rawEvent) {
     def body = parsedEvent.json
     switch(body?.type) {
         case 'state':
-            if(parsedEvent?.json?.value == 0) {
-                sendEvent(name: 'switch', value: 'off')
-            } else {
+            if(parsedEvent?.json?.data) {
                 sendEvent(name: 'switch', value: 'on')
+            } else {
+                sendEvent(name: 'switch', value: 'off')
             }
             break
     }
@@ -114,11 +114,9 @@ def on() {
     
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue('id')}"
+    	feature_id "${getDataValue('id')}"
         command_type 'Set'
-        data {
-            value 255
-        }
+        data true
     }
     def path = '/commands'
     def headers = [:] 
@@ -149,11 +147,9 @@ def off() {
     
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue('id')}"
+    	feature_id "${getDataValue('id')}"
         command_type 'Set'
-        data {
-            value 0
-        }
+        data false
     }
     def path = '/commands'
     def headers = [:] 
@@ -188,7 +184,7 @@ def subscribe(hostAddress) {
 
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-        feature_name getDataValue('id')
+        feature_id getDataValue('id')
         event_type 'State'
         callback "http://${callBackAddress}/notify"
         timeout 3600
@@ -257,7 +253,7 @@ def poll() {
     }
     def builder = new groovy.json.JsonBuilder()
     def root = builder {
-    	feature_name "${getDataValue('id')}"
+    	feature_id "${getDataValue('id')}"
         command_type 'Get'
     }
     def path = '/commands'
