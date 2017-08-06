@@ -137,7 +137,7 @@ def on() {
     )
 }
 
-def handleOn() {
+def handleOn(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleOn():'
     sendEvent(name: 'switch', value: 'on')
 }
@@ -170,7 +170,7 @@ def off() {
     )
 }
 
-def handleOff() {
+def handleOff(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleOff()'
     sendEvent(name: 'switch', value: 'off')
 }
@@ -208,7 +208,7 @@ def subscribe(hostAddress) {
     )
 }
 
-def handleSubscribe() {
+def handleSubscribe(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleSubscribe()'
 }
 
@@ -221,7 +221,7 @@ def subscribe(ip, port) {
     def existingIp = getDataValue('ip')
     def existingPort = getDataValue('port')
     if (ip && ip != existingIp) {
-         log.debug "Updating ip from $existingIp to $ip"    
+         log.debug "Updating ip from $existingIp to $ip"
        updateDataValue('ip', ip)
        def ipvalue = convertHexToIP(getDataValue('ip'))
          sendEvent(name: 'currentIP', value: ipvalue,
