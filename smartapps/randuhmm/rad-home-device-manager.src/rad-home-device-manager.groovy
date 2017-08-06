@@ -35,7 +35,7 @@ definition(
 
 preferences {
     page(name: 'deviceDiscovery', title: 'RAD Home Device Discovery',
-         mcontent: 'deviceDiscovery')
+         content: 'deviceDiscovery')
 }
 
 def getSsdpNames() {
