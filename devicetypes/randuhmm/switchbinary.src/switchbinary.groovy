@@ -94,9 +94,9 @@ def parse(String rawEvent) {
     def parsedEvent = parseLanMessage(rawEvent)
     
     def body = parsedEvent.json
-    switch(body?.type) {
-        case 'state':
-            if(parsedEvent?.json?.data) {
+    switch(body?.event_type) {
+        case 'State':
+            if(body?.data) {
                 sendEvent(name: 'switch', value: 'on')
             } else {
                 sendEvent(name: 'switch', value: 'off')
@@ -139,6 +139,7 @@ def on() {
 
 def handleOn(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleOn():'
+    log.debug "${hubResponse}"
     sendEvent(name: 'switch', value: 'on')
 }
 
@@ -172,6 +173,7 @@ def off() {
 
 def handleOff(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleOff()'
+    log.debug "${hubResponse}"
     sendEvent(name: 'switch', value: 'off')
 }
 
@@ -210,6 +212,7 @@ def subscribe(hostAddress) {
 
 def handleSubscribe(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'handleSubscribe()'
+    log.debug "${hubResponse}"
 }
 
 def refresh() {

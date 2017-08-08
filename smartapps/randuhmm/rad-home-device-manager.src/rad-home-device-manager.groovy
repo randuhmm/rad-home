@@ -173,7 +173,7 @@ def addDevices() {
                 ]
             ])
 
-            selectedDevice?.value?.feature.each { rd ->
+            selectedDevice?.value?.features.each { rd ->
             	def rdDni = "${selectedDevice.value.mac}-${rd.id}"
                 addChildDevice('randuhmm', rd.type, rdDni,
                     selectedDevice?.value.hub, [
