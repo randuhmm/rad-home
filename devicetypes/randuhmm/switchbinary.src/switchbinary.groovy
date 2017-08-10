@@ -282,10 +282,10 @@ def handlePoll(physicalgraph.device.HubResponse hubResponse) {
     log.debug 'Executing "handlePoll()"'
     unschedule('setOffline')
     def body = hubResponse.json
-    if(body?.value == 0) {
-        sendEvent(name: 'switch', value: 'off')
-    } else {
+    if(body?.data) {
         sendEvent(name: 'switch', value: 'on')
+    } else {
+        sendEvent(name: 'switch', value: 'off')
     }
 }
 
