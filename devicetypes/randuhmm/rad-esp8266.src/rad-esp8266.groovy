@@ -51,3 +51,15 @@ def parse(String rawEvent) {
 def refresh() {
     log.debug 'Executing "refresh()"'
 }
+
+def sync(ip, port) {
+    log.debug 'Executing "sync()"'
+    def existingIp = getDataValue('ip')
+    def existingPort = getDataValue('port')
+    if (ip && ip != existingIp) {
+        updateDataValue('ip', ip)
+    }
+    if (port && port != existingPort) {
+        updateDataValue('port', port)
+    }
+}
