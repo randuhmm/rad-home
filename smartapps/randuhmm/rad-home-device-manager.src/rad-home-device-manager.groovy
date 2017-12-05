@@ -188,6 +188,20 @@ def addDevices() {
                     ]
                 )
             }
+        } else {
+        	log.debug "Updating existing device: ${d}"
+        	d.sync(selectedDevice.value.networkAddress,
+            	   selectedDevice.value.deviceAddress)
+			selectedDevice?.value?.features.each { rd ->
+            	def rdDni = "${selectedDevice.value.mac}-${rd.id}"
+				def child = childDevices?.find {
+                	it.deviceNetworkId == rdDni
+            	}
+                if (child) {
+                	child.sync(selectedDevice.value.networkAddress,
+            	               selectedDevice.value.deviceAddress)
+                }
+            }
         }
     }
 }
@@ -204,14 +218,26 @@ def ssdpHandler(evt) {
     log.debug "ssdpUSN = ${ssdpUSN}"
     if (devices."${ssdpUSN}") {
         def d = devices."${ssdpUSN}"
+        log.debug "device = ${d}"
         if (d.networkAddress != parsedEvent.networkAddress ||
             d.deviceAddress != parsedEvent.deviceAddress) {
             d.networkAddress = parsedEvent.networkAddress
             d.deviceAddress = parsedEvent.deviceAddress
-            def child = getChildDevice(parsedEvent.mac)
-            if (child) {
-                child.sync(parsedEvent.networkAddress,
+            def dh = getChildDevice(parsedEvent.mac)
+            log.debug "dh = ${dh}"
+            if (dh) {
+                dh.sync(parsedEvent.networkAddress,
                            parsedEvent.deviceAddress)
+            }
+			d?.value?.features.each { rd ->
+            	def rdDni = "${d.value.mac}-${rd.id}"
+				def child = childDevices?.find {
+                	it.deviceNetworkId == rdDni
+            	}
+                if (child) {
+                	child.sync(d.value.networkAddress,
+            	               d.value.deviceAddress)
+                }
             }
         }
     } else {
